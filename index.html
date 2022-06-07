@@ -26,7 +26,30 @@
 
 <body>
   <div class="container">
+    <br />
+    <div>
+      <div class="dataset m-0.5">
+        <label for="table2">Choose</label>
 
+        <select name="table1" id="table1" class="ds-table">
+          <option value="scores">Scores</option>
+          <option value="words">Words</option>
+          <option value="shoppingbill">Shopping Bill</option>
+        </select>
+
+        <span> dataset as Table 1,</span>
+        <label for="table2">Choose</label>
+
+        <select name="table2" id="table2" class="ds-table">
+          <option value="empty">Empty</option>
+          <option value="scores">Scores</option>
+          <option value="words">Words</option>
+          <option value="shoppingbill">Shopping Bill</option>
+        </select>
+
+        <span> dataset as Table 2</span>
+      </div>
+    </div>
     <div>
       <br /><b>Pseudocode</b><br />
       <div class="d-flex flex-row justify-content-center">
@@ -35,11 +58,13 @@
       </div>
     </div>
     <br />
-    <div id="code-variables" class="d-flex justify-content-center">
-      <input class="variable m-1" type="text" value="A" size="10">
+    <div id="code-variables" class="justify-content-center">
+      <!-- <input class="variable m-1" type="text" value="A" size="10">
       <input class="variable m-1" type="text" value="B" size="10">
       <input class="variable m-1" type="text" value="L1" size="10">
-      <input class="variable m-1" type="text" value="L2" size="10">
+      <input class="variable m-1" type="text" value="L2" size="10"> -->
+      <input class="variable m-1" type="text" value="Table 1" size="10">
+      <input class="variable m-1" type="text" value="Table 2" size="10">
     </div>
     <br />
     <div class="d-flex justify-content-center">
@@ -50,6 +75,7 @@
       <textarea id="code-output" rows="15" cols="80" readonly></textarea>
     </div>
   </div>
+  <script src="datasets.js"></script>
   <script src="scripts.js"></script>
 </body>
 
