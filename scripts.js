@@ -363,16 +363,44 @@ var dataset = {
   ],
 };
 let editor = document.getElementById("code-editor");
-editor.value = `A = 1
+editor.value = `main()
+
+Procedure main()
+A = 1
 B = 34
 C = A *  B * 2
-L = []
-foreach element in L {
-  L = L ++ [5]
+L1 = [1,2,3,4]
+L2 = []
+foreach element in L1 {
+  L2 = L2 ++ [element]
+  L2 = [element] ++ L2 
 }
 
 C = 8
+End main
 `;
+
+// predefined functions
+
+function first(L) {
+  return L[0];
+}
+
+function last() {
+  return L[L.length - 1];
+}
+
+function init() {
+  return L.slice(0, -1);
+}
+
+function rest() {
+  return L.slice(1);
+}
+
+function keys(obj) {
+  return Object.keys(obj);
+}
 
 function evaluateCode() {
   console.clear();
@@ -385,13 +413,14 @@ function evaluateCode() {
   output.value = "";
   jsCode.value = editor.value;
 
-  LIST_CONCATENATION = /(\w+)\s*=\s*\1\s*\+\+\s*(.+)/;
+  LIST_CONCATENATION = /(\w+)\s*=\s*(\S+)\s*\+\+\s*(\S+)/;
   FOREACH_DEFINITION = /foreach\s*(\S+)\s+in\s+(\S+)/i;
+  FUNCTION_BLOCK_START = /Procedure\s+(\w+)\((.*)\)/;
+  FUNCTION_BLOCK_END = /End\s+(\w+)/;
 
   // parsing foreach definition
-  {
+  while (jsCode.value.match(FOREACH_DEFINITION)) {
     let matched = jsCode.value.match(FOREACH_DEFINITION);
-    console.log(matched)
     jsCode.value = jsCode.value.replace(
       FOREACH_DEFINITION,
       `for (${matched[1]} of ${matched[2]})`
@@ -399,23 +428,45 @@ function evaluateCode() {
   }
 
   // parsing list contactenation
-  {
+  while (jsCode.value.match(LIST_CONCATENATION)) {
     let matched = jsCode.value.match(LIST_CONCATENATION);
-    console.log(matched)
     jsCode.value = jsCode.value.replace(
       LIST_CONCATENATION,
-      `${matched[1]}.push(${matched[2].replace("[", "").replace("]", "")})`
+      matched[1] == matched[2]
+        ? `${matched[1]} = ${matched[1]}.concat(${matched[3]})`
+        : `${matched[1]} = ${matched[2]}.concat(${matched[1]})`
     );
   }
 
-  eval(jsCode);
+  // function block
+  while (jsCode.value.match(FUNCTION_BLOCK_START)) {
+    let matched = jsCode.value.match(FUNCTION_BLOCK_START);
+    console.log(matched)
+    jsCode.value = jsCode.value.replace(
+      FUNCTION_BLOCK_START,
+      `function ${matched[1]}(${matched[2]}) {`
+    );
+  }
+
+  while (jsCode.value.match(FUNCTION_BLOCK_END)) {
+    let matched = jsCode.value.match(FUNCTION_BLOCK_END);
+    console.log(matched)
+    jsCode.value = jsCode.value.replace(
+      FUNCTION_BLOCK_END,
+      `}`
+    );
+  }
+
+  // console.log(jsCode.value)
+  eval(jsCode.value);
 
   for (let variable of variables) {
     try {
       output.value =
-        output.value + `${variable.value}:\n${eval(variable.value)}` + "\n\n";
+        output.value + `${variable.value}:\n${this[variable.value]}` + "\n\n";
     } catch (error) {
-      output.value = error.message;
+      output.value += error.message + "\n";
+      console.log(error);
     }
   }
 }

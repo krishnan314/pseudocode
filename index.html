@@ -30,23 +30,25 @@
     <div>
       <br /><b>Pseudocode</b><br />
       <div class="d-flex flex-row justify-content-center">
-        <textarea id="code-editor" rows="20" cols="50"></textarea>
-        <textarea id="js-code" rows="20" cols="50" readonly></textarea>
+        <textarea id="code-editor" rows="20" cols="50" class="m-1 p-2"></textarea>
+        <textarea id="js-code" rows="20" cols="50" class="m-1 p-2" readonly></textarea>
       </div>
+    </div>
+    <br />
+    <div id="code-variables" class="d-flex justify-content-center">
+      <input class="variable m-1" type="text" value="A" size="10">
+      <input class="variable m-1" type="text" value="B" size="10">
+      <input class="variable m-1" type="text" value="L1" size="10">
+      <input class="variable m-1" type="text" value="L2" size="10">
     </div>
     <br />
     <div class="d-flex justify-content-center">
       <button onclick="evaluateCode()">Evaluate</button>
     </div>
-    <br />
-    <div id="code-variables">
-      <input class="variable" type="text" value="A">
-      <input class="variable" type="text" value="B">
-      <input class="variable" type="text" value="C">
-      <input class="variable" type="text" value="L">
-    </div>
     <br /><b>Output</b><br />
-    <textarea id="code-output" rows="15" cols="100" readonly></textarea>
+    <div class="d-flex justify-content-center">
+      <textarea id="code-output" rows="15" cols="80" readonly></textarea>
+    </div>
   </div>
   <script src="scripts.js"></script>
 </body>
