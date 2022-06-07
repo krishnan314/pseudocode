@@ -1,0 +1,54 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Pseudocode</title>
+  <meta name="description" content="Pseudocode parser for IITM BSC Computational Technology">
+  <meta name="author" content="SitePoint">
+
+  <meta property="og:title" content="A Basic HTML5 Template">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="#">
+  <meta property="og:description" content="Pseudocode parser for IITM BSC Computational Technology">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <link type="text/css" rel="stylesheet" src="styles.css">
+
+</head>
+
+<body>
+  <div class="container">
+
+    <div>
+      <br /><b>Pseudocode</b><br />
+      <div class="d-flex flex-row justify-content-center">
+        <textarea id="code-editor" rows="20" cols="50"></textarea>
+        <textarea id="js-code" rows="20" cols="50" readonly></textarea>
+      </div>
+    </div>
+    <br />
+    <div class="d-flex justify-content-center">
+      <button onclick="evaluateCode()">Evaluate</button>
+    </div>
+    <br />
+    <div id="code-variables">
+      <input class="variable" type="text" value="A">
+      <input class="variable" type="text" value="B">
+      <input class="variable" type="text" value="C">
+      <input class="variable" type="text" value="L">
+    </div>
+    <br /><b>Output</b><br />
+    <textarea id="code-output" rows="15" cols="100" readonly></textarea>
+  </div>
+  <script src="scripts.js"></script>
+</body>
+
+</html>
