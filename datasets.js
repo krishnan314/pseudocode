@@ -10,7 +10,6 @@ datasets = {
       Physics: 64,
       Chemistry: 78,
       Total: 210,
-      Average: 70,
     },
     {
       CardNo: 1,
@@ -22,7 +21,6 @@ datasets = {
       Physics: 45,
       Chemistry: 91,
       Total: 198,
-      Average: 66,
     },
     {
       CardNo: 2,
@@ -34,7 +32,6 @@ datasets = {
       Physics: 54,
       Chemistry: 77,
       Total: 188,
-      Average: 62.67,
     },
     {
       CardNo: 3,
@@ -46,7 +43,6 @@ datasets = {
       Physics: 53,
       Chemistry: 78,
       Total: 173,
-      Average: 57.67,
     },
     {
       CardNo: 4,
@@ -58,7 +54,6 @@ datasets = {
       Physics: 64,
       Chemistry: 89,
       Total: 240,
-      Average: 80,
     },
     {
       CardNo: 5,
@@ -70,7 +65,6 @@ datasets = {
       Physics: 92,
       Chemistry: 84,
       Total: 247,
-      Average: 82.33,
     },
     {
       CardNo: 6,
@@ -82,7 +76,6 @@ datasets = {
       Physics: 82,
       Chemistry: 87,
       Total: 250,
-      Average: 83.33,
     },
     {
       CardNo: 7,
@@ -94,7 +87,6 @@ datasets = {
       Physics: 92,
       Chemistry: 76,
       Total: 252,
-      Average: 84,
     },
     {
       CardNo: 8,
@@ -106,7 +98,6 @@ datasets = {
       Physics: 64,
       Chemistry: 51,
       Total: 189,
-      Average: 63,
     },
     {
       CardNo: 9,
@@ -118,7 +109,6 @@ datasets = {
       Physics: 88,
       Chemistry: 73,
       Total: 224,
-      Average: 74.67,
     },
     {
       CardNo: 10,
@@ -130,7 +120,6 @@ datasets = {
       Physics: 72,
       Chemistry: 68,
       Total: 204,
-      Average: 68,
     },
     {
       CardNo: 11,
@@ -142,7 +131,6 @@ datasets = {
       Physics: 92,
       Chemistry: 92,
       Total: 281,
-      Average: 93.67,
     },
     {
       CardNo: 12,
@@ -154,7 +142,6 @@ datasets = {
       Physics: 64,
       Chemistry: 71,
       Total: 187,
-      Average: 62.33,
     },
     {
       CardNo: 13,
@@ -166,7 +153,6 @@ datasets = {
       Physics: 73,
       Chemistry: 89,
       Total: 227,
-      Average: 75.67,
     },
     {
       CardNo: 14,
@@ -178,7 +164,6 @@ datasets = {
       Physics: 62,
       Chemistry: 93,
       Total: 244,
-      Average: 81.33,
     },
     {
       CardNo: 15,
@@ -190,7 +175,6 @@ datasets = {
       Physics: 58,
       Chemistry: 90,
       Total: 224,
-      Average: 74.67,
     },
     {
       CardNo: 16,
@@ -202,7 +186,6 @@ datasets = {
       Physics: 86,
       Chemistry: 43,
       Total: 216,
-      Average: 72,
     },
     {
       CardNo: 17,
@@ -214,7 +197,6 @@ datasets = {
       Physics: 81,
       Chemistry: 67,
       Total: 210,
-      Average: 70,
     },
     {
       CardNo: 18,
@@ -226,7 +208,6 @@ datasets = {
       Physics: 92,
       Chemistry: 97,
       Total: 261,
-      Average: 87,
     },
     {
       CardNo: 19,
@@ -238,7 +219,6 @@ datasets = {
       Physics: 78,
       Chemistry: 62,
       Total: 196,
-      Average: 65.33,
     },
     {
       CardNo: 20,
@@ -250,7 +230,6 @@ datasets = {
       Physics: 68,
       Chemistry: 91,
       Total: 252,
-      Average: 84,
     },
     {
       CardNo: 21,
@@ -262,7 +241,6 @@ datasets = {
       Physics: 69,
       Chemistry: 74,
       Total: 221,
-      Average: 73.67,
     },
     {
       CardNo: 22,
@@ -274,7 +252,6 @@ datasets = {
       Physics: 62,
       Chemistry: 57,
       Total: 181,
-      Average: 60.33,
     },
     {
       CardNo: 23,
@@ -286,7 +263,6 @@ datasets = {
       Physics: 91,
       Chemistry: 88,
       Total: 276,
-      Average: 92,
     },
     {
       CardNo: 24,
@@ -298,7 +274,6 @@ datasets = {
       Physics: 72,
       Chemistry: 58,
       Total: 174,
-      Average: 58,
     },
     {
       CardNo: 25,
@@ -310,7 +285,6 @@ datasets = {
       Physics: 75,
       Chemistry: 92,
       Total: 254,
-      Average: 84.67,
     },
     {
       CardNo: 26,
@@ -322,7 +296,6 @@ datasets = {
       Physics: 71,
       Chemistry: 82,
       Total: 227,
-      Average: 75.67,
     },
     {
       CardNo: 27,
@@ -334,7 +307,6 @@ datasets = {
       Physics: 76,
       Chemistry: 52,
       Total: 209,
-      Average: 69.67,
     },
     {
       CardNo: 28,
@@ -346,7 +318,6 @@ datasets = {
       Physics: 83,
       Chemistry: 83,
       Total: 240,
-      Average: 80,
     },
     {
       CardNo: 29,
@@ -358,7 +329,6 @@ datasets = {
       Physics: 66,
       Chemistry: 81,
       Total: 219,
-      Average: 73,
     },
   ],
 };

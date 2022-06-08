@@ -168,7 +168,7 @@ function evaluateCode() {
 
       switch (Object.prototype.toString.call(this[variableName])) {
         case "[object Array]":
-          if (/Table/.test(variableName)) {
+          if (/^Table/.test(variableName)) {
             output.value += `${variableName}:\n`;
             if (this[variableName].length != 0) {
               output.value += Object.keys(this[variableName][0]).join() + "\n";
@@ -209,7 +209,7 @@ function evaluateCode() {
           }
       }
     } catch (error) {
-      output.value += `${variable.value}:   ` + error.message + "\n\n";
+      output.value += `${variable.value}:   ${error.message}\n\n`;
       console.log(error);
     }
   }
