@@ -30,15 +30,15 @@ function first(L) {
   return L[0];
 }
 
-function last() {
+function last(L) {
   return L[L.length - 1];
 }
 
-function init() {
+function init(L) {
   return L.slice(0, -1);
 }
 
-function rest() {
+function rest(L) {
   return L.slice(1);
 }
 
@@ -80,7 +80,7 @@ function evaluateCode() {
   }
 
   LIST_CONCATENATION = /(\w+)\s*=\s*(\S+)\s*\+\+\s*(\S+)/;
-  FOREACH_DEFINITION = /foreach\s*(\S+)\s+in\s+(\S+)/i;
+  FOREACH_DEFINITION = /foreach\s*(\S+)\s+in\s+(\w+)/i;
   FUNCTION_BLOCK_START = /Procedure\s+(\w+)\((.*)\)/;
   FUNCTION_BLOCK_END = /End\s+(\w+)/;
   WHILE_CONDITION = /while\s*\((Table\s*1)\s+has\s+more\s+rows\s*\)/;
@@ -153,32 +153,47 @@ function evaluateCode() {
     eval(jsCode.value);
   } catch (error) {
     output.value += error.message + "\n";
-    console.error(error)
+    console.error(error);
   }
 
   for (let variable of variables) {
-    console.log(variable.value, output.value);
-    let value = null;
     try {
-      if (/Table/.test(variable.value)) {
-        variable.value = variable.value.replace(" ", "_");
-        output.value += `${variable.value}:` + "\n";
-        if (this[variable.value].length != 0) {
-          for (let key of Object.keys(this[variable.value][0])) {
-            output.value += key + ",";
-          }
-          for (let row of this[variable.value]) {
-            for (let key of Object.keys(this[variable.value][0])) {
-              output.value += row[key] + ",";
+      // console.log(
+      //   variable.value.toString(),
+      //   Object.prototype.toString.call(this[variable.value])
+      // );
+      switch (Object.prototype.toString.call(this[variable.value])) {
+        case "[object Array]":
+          output.value +=
+            `${variable.value}:    ${JSON.stringify(this[variable.value])}` +
+            "\n\n";
+          break;
+        case "[object Number]":
+          output.value +=
+            `${variable.value}:    ${this[variable.value]}` + "\n\n";
+          break;
+        default:
+          if (/Table/.test(variable.value)) {
+            variable.value = variable.value.replace(" ", "_");
+            output.value += `${variable.value}:` + "\n";
+            if (this[variable.value].length != 0) {
+              for (let key of Object.keys(this[variable.value][0])) {
+                output.value += key + ",";
+              }
+              output.value += "\n";
+              for (let row of this[variable.value]) {
+                for (let key of Object.keys(this[variable.value][0])) {
+                  output.value += row[key] + ",";
+                }
+                output.value += "\n";
+              }
+            } else {
+              output.value += "Empty Table\n\n";
             }
-            output.value += "\n";
+          } else {
+            output.value +=
+              `${variable.value}:   ${this[variable.value]}` + "\n\n";
           }
-        } else {
-          output.value += "Empty Table\n\n";
-        }
-      } else {
-        value = `${variable.value}:   ${this[variable.value]}` + "\n\n";
-        output.value += value;
       }
     } catch (error) {
       output.value += `${variable.value}:   ` + error.message + "\n\n";

@@ -20,7 +20,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
-  <link type="text/css" rel="stylesheet" src="styles.css">
+  <link type="text/css" rel="stylesheet" href="style.css">
 
 </head>
 
@@ -58,11 +58,14 @@
       </div>
     </div>
     <br />
+    <b>Variables to be printed</b><br />
     <div id="code-variables" class="justify-content-center">
-      <!-- <input class="variable m-1" type="text" value="A" size="10">
+      <input class="variable m-1" type="text" value="A" size="10">
       <input class="variable m-1" type="text" value="B" size="10">
       <input class="variable m-1" type="text" value="L1" size="10">
-      <input class="variable m-1" type="text" value="L2" size="10"> -->
+      <input class="variable m-1" type="text" value="L2" size="10">
+      <input class="variable m-1" type="text" value="" size="10">
+      <input class="variable m-1" type="text" value="" size="10">
       <input class="variable m-1" type="text" value="Table 1" size="10">
       <input class="variable m-1" type="text" value="Table 2" size="10">
     </div>
@@ -72,9 +75,10 @@
     </div>
     <br /><b>Output</b><br />
     <div class="d-flex justify-content-center">
-      <textarea id="code-output" rows="15" cols="80" readonly></textarea>
+      <textarea id="code-output" rows="15" cols="85" readonly></textarea>
     </div>
   </div>
+  <div id="variable-output"></div>
   <script src="datasets.js"></script>
   <script src="scripts.js"></script>
 </body>

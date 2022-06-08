@@ -1,3 +1,14 @@
 body {
-    background-color: yellow;
+}
+
+#code-editor {
+  font-family: "Courier Prime", "monospace";
+}
+
+#js-code {
+  font-family: "Courier Prime", "monospace";
+}
+
+#code-output {
+  font-family: "Courier Prime", "monospace";
 }
