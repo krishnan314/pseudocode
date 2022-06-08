@@ -4,7 +4,7 @@ while(Table 1 has more rows) {
   Read the first row X from Table 1
   if (X.Total > max) {
     max = X.Total
-    top = [X.CardNo, max]
+    topper = [X.CardNo, max]
   }
   Move X to Table 2
 }
@@ -64,7 +64,7 @@ function getTable(table) {
 }
 
 function evaluateCode() {
-  console.clear();
+  // console.clear();
 
   let editor = document.getElementById("code-editor");
   let jsCode = document.getElementById("js-code");
@@ -162,27 +162,41 @@ function evaluateCode() {
       //   variable.value.toString(),
       //   Object.prototype.toString.call(this[variable.value])
       // );
-      switch (Object.prototype.toString.call(this[variable.value])) {
+      const variableName = /^(Table|Pile)/.test(variable.value)
+        ? variable.value.replace(" ", "_")
+        : variable.value;
+
+      switch (Object.prototype.toString.call(this[variableName])) {
         case "[object Array]":
-          output.value +=
-            `${variable.value}:    ${JSON.stringify(this[variable.value])}` +
-            "\n\n";
+          if (/Table/.test(variableName)) {
+            output.value += `${variableName}:\n`;
+            if (this[variableName].length != 0) {
+              output.value += Object.keys(this[variableName][0]).join() + "\n";
+              for (let row of this[variableName]) {
+                output.value += Object.values(row).join() + "\n";
+              }
+            } else {
+              output.value += "Empty Table\n\n";
+            }
+          } else {
+            output.value +=
+              `${variableName}:    ${JSON.stringify(this[variableName])}` +
+              "\n\n";
+          }
           break;
         case "[object Number]":
-          output.value +=
-            `${variable.value}:    ${this[variable.value]}` + "\n\n";
+          output.value += `${variableName}:    ${this[variableName]}` + "\n\n";
           break;
         default:
-          if (/Table/.test(variable.value)) {
-            variable.value = variable.value.replace(" ", "_");
-            output.value += `${variable.value}:` + "\n";
-            if (this[variable.value].length != 0) {
-              for (let key of Object.keys(this[variable.value][0])) {
+          if (/Table/.test(variableName)) {
+            output.value += `${variableName}:\n`;
+            if (this[variableName].length != 0) {
+              for (let key of Object.keys(this[variableName][0])) {
                 output.value += key + ",";
               }
               output.value += "\n";
-              for (let row of this[variable.value]) {
-                for (let key of Object.keys(this[variable.value][0])) {
+              for (let row of this[variableName]) {
+                for (let key of Object.keys(this[variableName][0])) {
                   output.value += row[key] + ",";
                 }
                 output.value += "\n";
@@ -191,8 +205,7 @@ function evaluateCode() {
               output.value += "Empty Table\n\n";
             }
           } else {
-            output.value +=
-              `${variable.value}:   ${this[variable.value]}` + "\n\n";
+            output.value += `${variableName}:   ${this[variableName]}` + "\n\n";
           }
       }
     } catch (error) {
@@ -202,4 +215,4 @@ function evaluateCode() {
   }
 }
 
-// evaluateCode();
+evaluateCode();
