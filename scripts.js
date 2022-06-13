@@ -1,5 +1,45 @@
-let editor = document.getElementById("code-editor");
-editor.value = `max = 0, top = []
+// regex and replacement for the statements used
+const TRANSLATION = {
+  LIST_CONCATENATION_1: {
+    PATTERN: /(\w+)\s*=\s*\1\s*\+\+\s*(\S+)/,
+    REPLACEMENT: "{{1}} = {{1}}.concat({{2}})",
+  },
+  LIST_CONCATENATION_2: {
+    PATTERN: /(\w+)\s*=\s*(\S+)\s*\+\+\s*\1/,
+    REPLACEMENT: "{{1}} = {{2}}.concat({{1}})",
+  },
+  FOREACH_DEFINITION: {
+    PATTERN: /foreach\s*(\S+)\s+in\s+(\w+)/i,
+    REPLACEMENT: "for ({{1}} of {{2}})",
+  },
+  FUNCTION_BLOCK_START: {
+    PATTERN: /Procedure\s+(\w+)\((.*)\)/,
+    REPLACEMENT: "function {{1}}({{2}}) {",
+  },
+  FUNCTION_BLOCK_END: { PATTERN: /End\s+(\w+)/, REPLACEMENT: "}" },
+  WHILE_CONDITION: {
+    PATTERN: /while\s*\((Table\s*1)\s+has\s+more\s+rows\s*\)/,
+    REPLACEMENT: "while (this['{{1}}'.replace(' ', '_')].length > 0) ",
+  },
+  READ_ONE_ROW: {
+    PATTERN: /Read\s+the\s+first\s+row\s+(\S)\s+from\s+(.+)/,
+    REPLACEMENT: "{{1}} = this['{{2}}'.replace(' ', '_')].shift()",
+  },
+  MOVE_ONE_ROW: {
+    PATTERN: /Move\s+(\S)\s+to\s+(\S+ \S)/,
+    REPLACEMENT: "this['{{2}}'.replace(' ', '_')].push({{1}})",
+  },
+};
+
+// retrieval of buffer values
+function loadBuffer() {
+  let editor = document.getElementById("code-editor");
+  let variables = document.getElementsByClassName("variable");
+
+  if (localStorage["code-editor-value"]) {
+    editor.value = localStorage["code-editor-value"];
+  } else {
+    editor.value = `max = 0, top = []
 while(Table 1 has more rows) {
   Read the first row X from Table 1
   if (X.Total > max) {
@@ -14,15 +54,25 @@ main()
 Procedure main()
 A = 1, D = 5
 B = 34
-C = A *  B * 2
+C = A * B * 2
 L1 = [1,2,3,4], L2 = [], L3 = []
 foreach element in L1 {
   L2 = L2 ++ [element]
   L2 = [element] ++ L2 
 }
-End main
-
-`;
+End main`;
+  }
+  let bufferVariables = localStorage["variable-box-values"].split(",");
+  if (bufferVariables) {
+    for (let i in bufferVariables) {
+      try {
+        variables[i].value = bufferVariables[i];
+      } catch (error) {
+        continue;
+      }
+    }
+  }
+}
 
 // predefined functions
 
@@ -53,166 +103,139 @@ function length(L) {
 function getTable(table) {
   switch (table) {
     case "scores":
-      return JSON.stringify(datasets.scores);
+      return JSON.parse(JSON.stringify(datasets.scores));
     case "words":
-      return JSON.stringify(datasets.words);
+      return JSON.parse(JSON.stringify(datasets.words));
     case "shoppingbill":
-      return JSON.stringify(datasets.shoppingbill);
+      return JSON.parse(JSON.stringify(datasets.shoppingbill));
     case "empty":
-      return JSON.stringify([]);
+      return JSON.parse(JSON.stringify([]));
+  }
+}
+
+function stroutVariable(variable) {
+  let strout = "";
+  try {
+    const variableName = /^(Table|Pile)/.test(variable.value)
+      ? variable.value.replace(" ", "_")
+      : variable.value;
+
+    switch (Object.prototype.toString.call(this[variableName])) {
+      case "[object Array]":
+        if (/^Table/.test(variableName)) {
+          strout += `${variableName}:\n`;
+          if (this[variableName].length != 0) {
+            strout += Object.keys(this[variableName][0]).join() + "\n";
+            for (let row of this[variableName]) {
+              strout += Object.values(row).join() + "\n";
+            }
+          } else {
+            strout += "Empty Table\n\n";
+          }
+        } else {
+          strout +=
+            `${variableName}:    ${JSON.stringify(this[variableName])}` +
+            "\n\n";
+        }
+        break;
+      case "[object Number]":
+        strout += `${variableName}:    ${this[variableName]}` + "\n\n";
+        break;
+      default:
+        strout += `${variableName}:   ${this[variableName]}` + "\n\n";
+    }
+  } catch (error) {
+    strout += `${variable.value}:   ${error.message}\n\n`;
+    console.log(error);
+  }
+  return strout;
+}
+
+// parse the CT specific to equivalent js
+function translate() {
+  let jsCode = document.getElementById("js-code");
+  // console.log(TRANSLATION);
+  for (let t in TRANSLATION) {
+    // console.log(t);
+    let ucount = 0;
+    // console.log(jsCode.value);
+    while (jsCode.value.match(TRANSLATION[t].PATTERN)) {
+      ucount++;
+      if (ucount > 3) {
+        console.log(`break ucount:${ucount}`);
+        break;
+      }
+      let matched = jsCode.value.match(TRANSLATION[t].PATTERN);
+      // console.log(matched);
+      let translated = TRANSLATION[t].REPLACEMENT;
+      for (i = 1; i <= matched.length; i++) {
+        try {
+          // console.log("p", translated);
+          translated = translated.split("{{" + i + "}}").join(matched[i]);
+          // console.log("n", translated);
+        } catch (error) {
+          console.log(error);
+          // console.log(translated)
+        }
+        // console.log(translated);
+      }
+      jsCode.value = jsCode.value.replace(TRANSLATION[t].PATTERN, translated);
+    }
+    // console.log(jsCode.value);
   }
 }
 
 function evaluateCode() {
   // console.clear();
 
+  // getting the DOM elements
   let editor = document.getElementById("code-editor");
   let jsCode = document.getElementById("js-code");
   let output = document.getElementById("code-output");
   let variables = document.getElementsByClassName("variable");
   let tables = document.getElementsByClassName("ds-table");
 
+  // setting default values
   output.value = "";
   jsCode.value = editor.value;
 
+  // setting localstorage values
+  localStorage["code-editor-value"] = editor.value;
+  localStorage["variable-box-values"] = Array.from(variables).map(
+    (variable) => {
+      return variable.value;
+    }
+  );
+
+  // setting localstorage values if it is not empty otherwise default
+  loadBuffer();
+
+  // assign the selected dataset to the table variables
   for (let t = 0; t < tables.length; t++) {
-    eval(`Table_${t + 1} = JSON.parse(getTable(tables[t].value))`);
+    this[`Table_${t + 1}`] = getTable(tables[t].value);
   }
 
-  LIST_CONCATENATION = /(\w+)\s*=\s*(\S+)\s*\+\+\s*(\S+)/;
-  FOREACH_DEFINITION = /foreach\s*(\S+)\s+in\s+(\w+)/i;
-  FUNCTION_BLOCK_START = /Procedure\s+(\w+)\((.*)\)/;
-  FUNCTION_BLOCK_END = /End\s+(\w+)/;
-  WHILE_CONDITION = /while\s*\((Table\s*1)\s+has\s+more\s+rows\s*\)/;
-  READ_ONE_ROW = /Read\s+the\s+first\s+row\s+(\S)\s+from\s+(.+)/;
-  MOVE_ONE_ROW = /Move\s+(\S)\s+to\s+(\S+ \S)/;
-
-  // parsing foreach definition
-  while (jsCode.value.match(FOREACH_DEFINITION)) {
-    let matched = jsCode.value.match(FOREACH_DEFINITION);
-    jsCode.value = jsCode.value.replace(
-      FOREACH_DEFINITION,
-      `for (${matched[1]} of ${matched[2]})`
-    );
-  }
-
-  // parsing while condition
-  while (jsCode.value.match(WHILE_CONDITION)) {
-    let matched = jsCode.value.match(WHILE_CONDITION);
-    jsCode.value = jsCode.value.replace(
-      WHILE_CONDITION,
-      `while (${matched[1].replace(" ", "_")}.length > 0) `
-    );
-  }
-
-  // reading one card to from table
-  while (jsCode.value.match(READ_ONE_ROW)) {
-    let matched = jsCode.value.match(READ_ONE_ROW);
-    jsCode.value = jsCode.value.replace(
-      READ_ONE_ROW,
-      `${matched[1]} = ${matched[2].replace(" ", "_")}.shift()`
-    );
-  }
-
-  // moving one card to another table
-  while (jsCode.value.match(MOVE_ONE_ROW)) {
-    let matched = jsCode.value.match(MOVE_ONE_ROW);
-    jsCode.value = jsCode.value.replace(
-      MOVE_ONE_ROW,
-      `${matched[2].replace(" ", "_")}.push(${matched[1]})`
-    );
-  }
-
-  // parsing list contactenation
-  while (jsCode.value.match(LIST_CONCATENATION)) {
-    let matched = jsCode.value.match(LIST_CONCATENATION);
-    jsCode.value = jsCode.value.replace(
-      LIST_CONCATENATION,
-      matched[1] == matched[2]
-        ? `${matched[1]} = ${matched[1]}.concat(${matched[3]})`
-        : `${matched[1]} = ${matched[2]}.concat(${matched[1]})`
-    );
-  }
-
-  // function block
-  while (jsCode.value.match(FUNCTION_BLOCK_START)) {
-    let matched = jsCode.value.match(FUNCTION_BLOCK_START);
-    jsCode.value = jsCode.value.replace(
-      FUNCTION_BLOCK_START,
-      `function ${matched[1]}(${matched[2]}) {`
-    );
-  }
-
-  while (jsCode.value.match(FUNCTION_BLOCK_END)) {
-    let matched = jsCode.value.match(FUNCTION_BLOCK_END);
-    jsCode.value = jsCode.value.replace(FUNCTION_BLOCK_END, `}`);
-  }
+  translate(TRANSLATION);
 
   try {
-    // console.log(jsCode.value)
+    // console.log(jsCode.value);
     eval(jsCode.value);
   } catch (error) {
-    output.value += error.message + "\n";
-    console.error(error);
+    output.value += error.stack + "\n\n";
+    console.error(error.stack);
   }
 
   for (let variable of variables) {
-    try {
-      // console.log(
-      //   variable.value.toString(),
-      //   Object.prototype.toString.call(this[variable.value])
-      // );
-      const variableName = /^(Table|Pile)/.test(variable.value)
-        ? variable.value.replace(" ", "_")
-        : variable.value;
-
-      switch (Object.prototype.toString.call(this[variableName])) {
-        case "[object Array]":
-          if (/^Table/.test(variableName)) {
-            output.value += `${variableName}:\n`;
-            if (this[variableName].length != 0) {
-              output.value += Object.keys(this[variableName][0]).join() + "\n";
-              for (let row of this[variableName]) {
-                output.value += Object.values(row).join() + "\n";
-              }
-            } else {
-              output.value += "Empty Table\n\n";
-            }
-          } else {
-            output.value +=
-              `${variableName}:    ${JSON.stringify(this[variableName])}` +
-              "\n\n";
-          }
-          break;
-        case "[object Number]":
-          output.value += `${variableName}:    ${this[variableName]}` + "\n\n";
-          break;
-        default:
-          if (/Table/.test(variableName)) {
-            output.value += `${variableName}:\n`;
-            if (this[variableName].length != 0) {
-              for (let key of Object.keys(this[variableName][0])) {
-                output.value += key + ",";
-              }
-              output.value += "\n";
-              for (let row of this[variableName]) {
-                for (let key of Object.keys(this[variableName][0])) {
-                  output.value += row[key] + ",";
-                }
-                output.value += "\n";
-              }
-            } else {
-              output.value += "Empty Table\n\n";
-            }
-          } else {
-            output.value += `${variableName}:   ${this[variableName]}` + "\n\n";
-          }
-      }
-    } catch (error) {
-      output.value += `${variable.value}:   ${error.message}\n\n`;
-      console.log(error);
-    }
+    output.value += stroutVariable(variable);
   }
 }
 
-evaluateCode();
+loadBuffer();
+
+try {
+  console.clear();
+  evaluateCode();
+} catch (error) {
+  let output = document.getElementById("code-output");
+  output.value = error.stack;
+}
