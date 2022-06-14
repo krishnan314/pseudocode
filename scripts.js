@@ -26,8 +26,24 @@ const TRANSLATION = {
     REPLACEMENT: "{{1}} = this['{{2}}'.replace(' ', '_')].shift()",
   },
   MOVE_ONE_ROW: {
-    PATTERN: /Move\s+(\S)\s+to\s+(\S+ \S)/,
-    REPLACEMENT: "this['{{2}}'.replace(' ', '_')].push({{1}})",
+    PATTERN: /Move\s+(row\s+)?(\S)\s+to\s+(\S+ \S)/,
+    REPLACEMENT: "this['{{3}}'.replace(' ', '_')].push({{2}})",
+  },
+  ITH_LETTER_OF_WORD: {
+    PATTERN: /(\w+)th letter of ([\w.]+)/,
+    REPLACEMENT: "{{2}}[{{1}}-1]",
+  },
+  NEGATION: {
+    PATTERN: /\bnot\b/,
+    REPLACEMENT: "!",
+  },
+  PARSE_TRUE: {
+    PATTERN: /\bTrue\b/,
+    REPLACEMENT: "true",
+  },
+  ENDS_WITH_FULL_STOP: {
+    PATTERN: /\b([\w.]+)\s+ends\s+with\s+a\s+full\s+stop/,
+    REPLACEMENT: "{{1}}[{{1}}.length - 1] == '.'",
   },
 };
 
@@ -75,7 +91,6 @@ End main`;
 }
 
 // predefined functions
-
 function first(L) {
   return L[0];
 }
@@ -94,6 +109,10 @@ function rest(L) {
 
 function keys(obj) {
   return Object.keys(obj);
+}
+
+function isKey(collection, obj) {
+  return obj in collection;
 }
 
 function length(L) {
@@ -139,10 +158,45 @@ function stroutVariable(variable) {
         }
         break;
       case "[object Number]":
-        strout += `${variableName}:    ${this[variableName]}` + "\n\n";
+        strout += `${variableName}:    ${this[variableName]}\n\n`;
+        break;
+      case "[object Object]":
+        strout += `${variableName}:    ${JSON.stringify(
+          this[variableName],
+          null,
+          2
+        )}\n\n`;
         break;
       default:
-        strout += `${variableName}:   ${this[variableName]}` + "\n\n";
+        let variableSplit = variableName
+          .split(/(\.|\[|\])/)
+          .filter((x) => !/[\.\[\]]/.test(x))
+          .filter((x) => x != "")
+          .map((x) => x.split('"').join("").split("'").join(""));
+        const variableNameBase = variableSplit[0];
+        let variableNameRest = variableSplit.slice(1);
+        // console.log(variableSplit);
+
+        const getVariableWithSub = (f, val, levels) => {
+          if (levels.length == 0) {
+            return val;
+          }
+          if (levels.length == 1) {
+            return val[levels[0]];
+          }
+
+          return f(f, val[levels[0]], levels.slice(1));
+        };
+
+        strout += `${variableName}:   ${JSON.stringify(
+          getVariableWithSub(
+            getVariableWithSub,
+            this[variableNameBase],
+            variableNameRest
+          ),
+          null,
+          2
+        )}\n\n`;
     }
   } catch (error) {
     strout += `${variable.value}:   ${error.message}\n\n`;
