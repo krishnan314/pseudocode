@@ -18,7 +18,7 @@ const TRANSLATION = {
   },
   FUNCTION_BLOCK_END: { PATTERN: /End\s+(\w+)/, REPLACEMENT: "}" },
   WHILE_CONDITION: {
-    PATTERN: /while\s*\((Table\s*1)\s+has\s+more\s+rows\s*\)/,
+    PATTERN: /while\s*\((Table\s*\w+)\s+has\s+more\s+rows\s*\)/,
     REPLACEMENT: "while (this['{{1}}'.replace(' ', '_')].length > 0) ",
   },
   READ_ONE_ROW: {
