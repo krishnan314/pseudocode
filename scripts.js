@@ -208,34 +208,25 @@ function stroutVariable(variable) {
 // parse the CT specific to equivalent js
 function translate() {
   let jsCode = document.getElementById("js-code");
-  // console.log(TRANSLATION);
   for (let t in TRANSLATION) {
-    // console.log(t);
-    let ucount = 0;
-    // console.log(jsCode.value);
+    let count = 0;
     while (jsCode.value.match(TRANSLATION[t].PATTERN)) {
-      ucount++;
-      if (ucount > 3) {
-        console.log(`break ucount:${ucount}`);
+      count++;
+      if (count > 10000) {
+        console.log(`break ucount:${count}`);
         break;
       }
       let matched = jsCode.value.match(TRANSLATION[t].PATTERN);
-      // console.log(matched);
       let translated = TRANSLATION[t].REPLACEMENT;
       for (i = 1; i <= matched.length; i++) {
         try {
-          // console.log("p", translated);
           translated = translated.split("{{" + i + "}}").join(matched[i]);
-          // console.log("n", translated);
         } catch (error) {
           console.log(error);
-          // console.log(translated)
         }
-        // console.log(translated);
       }
       jsCode.value = jsCode.value.replace(TRANSLATION[t].PATTERN, translated);
     }
-    // console.log(jsCode.value);
   }
 }
 
@@ -286,10 +277,10 @@ function evaluateCode() {
 
 loadBuffer();
 
-try {
-  console.clear();
-  evaluateCode();
-} catch (error) {
-  let output = document.getElementById("code-output");
-  output.value = error.stack;
-}
+// try {
+//   console.clear();
+//   evaluateCode();
+// } catch (error) {
+//   let output = document.getElementById("code-output");
+//   output.value = error.stack;
+// }
