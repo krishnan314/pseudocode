@@ -235,14 +235,14 @@ function evaluateCode() {
 
   // getting the DOM elements
   let editor = document.getElementById("code-editor");
-  let jsCode = document.getElementById("js-code");
+  let jscode = document.getElementById("js-code");
   let output = document.getElementById("code-output");
   let variables = document.getElementsByClassName("variable");
   let tables = document.getElementsByClassName("ds-table");
 
   // setting default values
   output.value = "";
-  jsCode.value = editor.value;
+  jscode.value = editor.value;
 
   // setting localstorage values
   localStorage["code-editor-value"] = editor.value;
@@ -260,16 +260,34 @@ function evaluateCode() {
     this[`Table_${t + 1}`] = getTable(tables[t].value);
   }
 
+  // pseudocode is parsed to javascript
   translate(TRANSLATION);
 
   try {
     // console.log(jsCode.value);
-    eval(jsCode.value);
+    // eval(jsCode.value);
+    const worker = new Worker("worker.js");
+    worker.postMessage({
+      datasets: datasets,
+      jscode: jscode.value,
+      // variables: variables,
+    });
+
+    let gotBackData;
+    worker.onmessage = function (event) {
+      gotBackData = JSON.parse(event.data);
+    };
+    setTimeout(() => {
+      worker.terminate();
+      console.log(gotBackData.executionStatus);
+      output.value = "Timeout Error";
+    }, 3000);
   } catch (error) {
     output.value += error.stack + "\n\n";
     console.error(error.stack);
   }
 
+  // console.log(variables);
   for (let variable of variables) {
     output.value += stroutVariable(variable);
   }
@@ -277,10 +295,10 @@ function evaluateCode() {
 
 loadBuffer();
 
-// try {
-//   console.clear();
-//   evaluateCode();
-// } catch (error) {
-//   let output = document.getElementById("code-output");
-//   output.value = error.stack;
-// }
+try {
+  console.clear();
+  evaluateCode();
+} catch (error) {
+  let output = document.getElementById("code-output");
+  output.value = error.stack;
+}
