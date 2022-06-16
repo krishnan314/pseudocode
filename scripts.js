@@ -144,17 +144,17 @@ function stroutVariable(thisWorker, variable) {
         if (/^Table/.test(variableName)) {
           strout += `${variableName}:\n`;
           if (thisWorker[variableName].length != 0) {
-            strout += Object.keys(thisWorker[variableName][0]).join() + "\n";
+            strout += `${Object.keys(thisWorker[variableName][0]).join()}\n`;
             for (let row of thisWorker[variableName]) {
-              strout += Object.values(row).join() + "\n";
+              strout += `${Object.values(row).join()}\n`;
             }
           } else {
-            strout += "Empty Table\n\n";
+            strout += `Empty Table\n\n`;
           }
         } else {
-          strout +=
-            `${variableName}:    ${JSON.stringify(thisWorker[variableName])}` +
-            "\n\n";
+          strout += `${variableName}:    ${JSON.stringify(
+            thisWorker[variableName]
+          )}\n\n`;
         }
         break;
       case "[object Number]":
@@ -207,16 +207,16 @@ function stroutVariable(thisWorker, variable) {
 
 // parse the CT specific to equivalent js
 function translate() {
-  let jsCode = document.getElementById("js-code");
+  let jscode = document.getElementById("js-code");
   for (let t in TRANSLATION) {
     let count = 0;
-    while (jsCode.value.match(TRANSLATION[t].PATTERN)) {
+    while (jscode.value.match(TRANSLATION[t].PATTERN)) {
       count++;
       if (count > 10000) {
         console.log(`break ucount:${count}`);
         break;
       }
-      let matched = jsCode.value.match(TRANSLATION[t].PATTERN);
+      let matched = jscode.value.match(TRANSLATION[t].PATTERN);
       let translated = TRANSLATION[t].REPLACEMENT;
       for (i = 1; i <= matched.length; i++) {
         try {
@@ -225,7 +225,7 @@ function translate() {
           console.log(error);
         }
       }
-      jsCode.value = jsCode.value.replace(TRANSLATION[t].PATTERN, translated);
+      jscode.value = jscode.value.replace(TRANSLATION[t].PATTERN, translated);
     }
   }
 }
@@ -265,8 +265,8 @@ function evaluateCode() {
 
   let gotBackData;
   try {
-    // console.log(jsCode.value);
-    // eval(jsCode.value);
+    // console.log(jscode.value);
+    // eval(jscode.value);
     const worker = new Worker("worker.js");
     worker.postMessage({
       datasets: datasets,
@@ -276,8 +276,12 @@ function evaluateCode() {
     worker.onmessage = function (event) {
       gotBackData = JSON.parse(event.data);
       output.value += `Execution Status: ${gotBackData.executionStatus}\n\n`;
-      for (let variable of variables) {
-        output.value += stroutVariable(gotBackData, variable);
+      if (gotBackData.executionStatus == "Success") {
+        for (let variable of variables) {
+          output.value += stroutVariable(gotBackData, variable);
+        }
+      } else if (gotBackData.executionStatus == "Error") {
+        output.value += `${gotBackData.error.message}\n\n`;
       }
     };
     setTimeout(() => {
@@ -295,10 +299,10 @@ function evaluateCode() {
 
 loadBuffer();
 
-try {
-  console.clear();
-  evaluateCode();
-} catch (error) {
-  let output = document.getElementById("code-output");
-  output.value = error.stack;
-}
+// try {
+//   console.clear();
+//   evaluateCode();
+// } catch (error) {
+//   let output = document.getElementById("code-output");
+//   output.value = error.stack;
+// }

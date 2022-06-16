@@ -13,6 +13,7 @@ self.onmessage = function (event) {
     console.log("Evaluated successfully");
   } catch (e) {
     executionStatus = "Error";
-    self.postMessage(e.message);
+    error = { stack: e.stack, message: e.message };
+    self.postMessage(JSON.stringify(this));
   }
 };
