@@ -132,20 +132,20 @@ function getTable(table) {
   }
 }
 
-function stroutVariable(variable) {
+function stroutVariable(thisWorker, variable) {
   let strout = "";
   try {
     const variableName = /^(Table|Pile)/.test(variable.value)
       ? variable.value.replace(" ", "_")
       : variable.value;
 
-    switch (Object.prototype.toString.call(this[variableName])) {
+    switch (Object.prototype.toString.call(thisWorker[variableName])) {
       case "[object Array]":
         if (/^Table/.test(variableName)) {
           strout += `${variableName}:\n`;
-          if (this[variableName].length != 0) {
-            strout += Object.keys(this[variableName][0]).join() + "\n";
-            for (let row of this[variableName]) {
+          if (thisWorker[variableName].length != 0) {
+            strout += Object.keys(thisWorker[variableName][0]).join() + "\n";
+            for (let row of thisWorker[variableName]) {
               strout += Object.values(row).join() + "\n";
             }
           } else {
@@ -153,16 +153,16 @@ function stroutVariable(variable) {
           }
         } else {
           strout +=
-            `${variableName}:    ${JSON.stringify(this[variableName])}` +
+            `${variableName}:    ${JSON.stringify(thisWorker[variableName])}` +
             "\n\n";
         }
         break;
       case "[object Number]":
-        strout += `${variableName}:    ${this[variableName]}\n\n`;
+        strout += `${variableName}:    ${thisWorker[variableName]}\n\n`;
         break;
       case "[object Object]":
         strout += `${variableName}:    ${JSON.stringify(
-          this[variableName],
+          thisWorker[variableName],
           null,
           2
         )}\n\n`;
@@ -191,7 +191,7 @@ function stroutVariable(variable) {
         strout += `${variableName}:   ${JSON.stringify(
           getVariableWithSub(
             getVariableWithSub,
-            this[variableNameBase],
+            thisWorker[variableNameBase],
             variableNameRest
           ),
           null,
@@ -263,6 +263,7 @@ function evaluateCode() {
   // pseudocode is parsed to javascript
   translate(TRANSLATION);
 
+  let gotBackData;
   try {
     // console.log(jsCode.value);
     // eval(jsCode.value);
@@ -270,26 +271,25 @@ function evaluateCode() {
     worker.postMessage({
       datasets: datasets,
       jscode: jscode.value,
-      // variables: variables,
     });
 
-    let gotBackData;
     worker.onmessage = function (event) {
       gotBackData = JSON.parse(event.data);
+      output.value += `Execution Status: ${gotBackData.executionStatus}\n\n`;
+      for (let variable of variables) {
+        output.value += stroutVariable(gotBackData, variable);
+      }
     };
     setTimeout(() => {
       worker.terminate();
-      console.log(gotBackData.executionStatus);
-      output.value = "Timeout Error";
+      // console.log(gotBackData.executionStatus);
+      if (!gotBackData) {
+        output.value = "Execution Status: Timeout Error";
+      }
     }, 3000);
   } catch (error) {
     output.value += error.stack + "\n\n";
     console.error(error.stack);
-  }
-
-  // console.log(variables);
-  for (let variable of variables) {
-    output.value += stroutVariable(variable);
   }
 }
 
