@@ -1,5 +1,4 @@
 // config
-
 const TIMEOUT = 3000; // time in milliseconds
 
 
