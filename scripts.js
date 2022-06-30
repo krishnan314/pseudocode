@@ -1,3 +1,8 @@
+// config
+
+const TIMEOUT = 3000; // time in milliseconds
+
+
 // regex and replacement for the statements used
 const TRANSLATION = {
   LIST_CONCATENATION_1: {
@@ -44,6 +49,14 @@ const TRANSLATION = {
   ENDS_WITH_FULL_STOP: {
     PATTERN: /\b([\w.]+)\s+ends\s+with\s+a\s+full\s+stop/,
     REPLACEMENT: "{{1}}[{{1}}.length - 1] == '.'",
+  },
+  AND: {
+    PATTERN: /(\(.*)and(.*\))/,
+    REPLACEMENT: "{{1}}&&{{2}}",
+  },
+  OR: {
+    PATTERN: /(\(.*)or(.*\))/,
+    REPLACEMENT: "{{1}}||{{2}}",
   },
 };
 
@@ -119,6 +132,7 @@ function length(L) {
   return L.length;
 }
 
+// get dataset as table/list
 function getTable(table) {
   switch (table) {
     case "scores":
@@ -132,6 +146,7 @@ function getTable(table) {
   }
 }
 
+// get variable from the object/this
 function stroutVariable(thisWorker, variable) {
   let strout = "";
   try {
@@ -205,7 +220,7 @@ function stroutVariable(thisWorker, variable) {
   return strout;
 }
 
-// parse the CT specific to equivalent js
+// parse the CT specific statements to equivalent js
 function translate() {
   let jscode = document.getElementById("js-code");
   for (let t in TRANSLATION) {
@@ -230,6 +245,7 @@ function translate() {
   }
 }
 
+// code to do all DOM manipulation, and IO between worker
 function evaluateCode() {
   // console.clear();
 
@@ -278,7 +294,9 @@ function evaluateCode() {
       output.value += `Execution Status: ${gotBackData.executionStatus}\n\n`;
       if (gotBackData.executionStatus == "Success") {
         for (let variable of variables) {
-          output.value += stroutVariable(gotBackData, variable);
+          if (variable.value != "") {
+            output.value += stroutVariable(gotBackData, variable);
+          }
         }
       } else if (gotBackData.executionStatus == "Error") {
         output.value += `${gotBackData.error.message}\n\n`;
@@ -290,7 +308,7 @@ function evaluateCode() {
       if (!gotBackData) {
         output.value = "Execution Status: Timeout Error";
       }
-    }, 3000);
+    }, TIMEOUT);
   } catch (error) {
     output.value += error.stack + "\n\n";
     console.error(error.stack);
